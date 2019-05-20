@@ -24,7 +24,7 @@ func NewAdapter(collection *mongo.Collection) Adapter {
 
 // FindMany ...
 func (a Adapter) FindMany() ([]entities.User, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	cur, err := a.Collection.Find(ctx, bson.D{})
 	if err != nil {
 		return []entities.User{}, err
@@ -53,7 +53,7 @@ func (a Adapter) FindMany() ([]entities.User, error) {
 func (a Adapter) FindOne(userID string) (entities.User, error) {
 	var user UserMongo
 	var foundUser entities.User
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	objectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return foundUser, err
@@ -69,7 +69,7 @@ func (a Adapter) FindOne(userID string) (entities.User, error) {
 
 // CreateOne ...
 func (a Adapter) CreateOne(userData map[string]interface{}) (entities.User, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	data := bson.M{
 		"name":        userData["name"],
 		"age":         userData["age"],
@@ -91,7 +91,7 @@ func (a Adapter) CreateOne(userData map[string]interface{}) (entities.User, erro
 
 // UpdateOne ...
 func (a Adapter) UpdateOne(userID string, userData map[string]interface{}) (entities.User, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	data := bson.M{
 		"name":        userData["name"],
 		"age":         userData["age"],
@@ -129,7 +129,7 @@ func (a Adapter) UpdateOne(userID string, userData map[string]interface{}) (enti
 
 // DeleteOne ...
 func (a Adapter) DeleteOne(userID string) (entities.User, error) {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	ObjectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return entities.User{}, err

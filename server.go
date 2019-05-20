@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"time"
 
@@ -15,16 +16,31 @@ import (
 )
 
 func main() {
-	e := echo.New()
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	env := flag.String("env", "local", "Input either local or production")
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27018"))
-	collection := mongoClient.Database("db").Collection("users")
+	var mongoConnectionURI string
+	var db string
+	flag.Parse()
+	if *env == "local" {
+		mongoConnectionURI = "mongodb://localhost:27018"
+		db = "db"
+	} else {
+		mongoConnectionURI = "mongodb://root:root1!@ds157946.mlab.com:57946/echo-mvc"
+		db = "echo-mvc"
+	}
+	log.Printf("env: %s\n", *env)
+	log.Printf("Mongo connection uri: %s\n", mongoConnectionURI)
+	log.Printf("Mongo default db: %s\n", db)
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
+	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoConnectionURI))
+	collection := mongoClient.Database(db).Collection("users")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
 	userMongoAdapter := userAdapter.NewAdapter(collection)
 	userModel := userModel.NewModel(userMongoAdapter)
