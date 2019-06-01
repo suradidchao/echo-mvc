@@ -1,8 +1,16 @@
 package seed
 
 import (
+	"context"
+	"fmt"
+	"log"
 	"math/rand"
 	"time"
+
+	userModel "github.com/suradidchao/echo-mvc/models/user"
+	userAdapter "github.com/suradidchao/echo-mvc/models/user/adapters/mongo"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // User is ...
@@ -29,4 +37,36 @@ func GetUsers() []User {
 		users = append(users, newUser)
 	}
 	return users
+}
+
+func SeedUsers(mongoConnectionURI string, db string) {
+	names := []string{"Joe", "Jimmy", "William", "Jason", "Bill", "Thomas", "Isiah", "Vin"}
+	nationality := []string{"TH", "MY", "US", "UK"}
+	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
+	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoConnectionURI))
+	collection := mongoClient.Database(db).Collection("users")
+	if err != nil {
+		log.Fatal(err)
+	}
+	userMongoAdapter := userAdapter.NewAdapter(collection)
+	userModel := userModel.NewModel(userMongoAdapter)
+	user1 := map[string]interface{}{
+		"name":        names[0],
+		"age":         25,
+		"nationality": nationality[2],
+	}
+	user2 := map[string]interface{}{
+		"name":        names[2],
+		"age":         30,
+		"nationality": nationality[3],
+	}
+
+	_, err = userModel.CreateUser(user1)
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = userModel.CreateUser(user2)
+	if err != nil {
+		fmt.Println(err)
+	}
 }

@@ -8,9 +8,11 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
 	userController "github.com/suradidchao/echo-mvc/controllers/user"
 	userModel "github.com/suradidchao/echo-mvc/models/user"
 	userAdapter "github.com/suradidchao/echo-mvc/models/user/adapters/mongo"
+	"github.com/suradidchao/echo-mvc/seed"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -22,8 +24,10 @@ func main() {
 	var db string
 	flag.Parse()
 	if *env == "local" {
-		mongoConnectionURI = "mongodb://localhost:27018"
+		mongoConnectionURI = "localhost:27017"
 		db = "db"
+		seed.SeedUsers(mongoConnectionURI, db)
+
 	} else {
 		mongoConnectionURI = "mongodb://root:root1!@ds157946.mlab.com:57946/echo-mvc"
 		db = "echo-mvc"

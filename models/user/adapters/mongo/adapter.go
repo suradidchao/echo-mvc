@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/suradidchao/echo-mvc/entities"
+	mapper "github.com/suradidchao/echo-mvc/models/user/mappers/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,14 +34,14 @@ func (a Adapter) FindMany() ([]entities.User, error) {
 	defer cur.Close(ctx)
 	var users []entities.User
 	for cur.Next(ctx) {
-		var user UserMongo
+		var user mapper.UserMongo
 
 		err := cur.Decode(&user)
 		if err != nil {
 			return []entities.User{}, err
 		}
 
-		currentUser := MapUserMongoToUser(user)
+		currentUser := mapper.MapUserMongoToUser(user)
 		users = append(users, currentUser)
 	}
 	if err := cur.Err(); err != nil {
@@ -51,7 +52,7 @@ func (a Adapter) FindMany() ([]entities.User, error) {
 
 // FindOne ...
 func (a Adapter) FindOne(userID string) (entities.User, error) {
-	var user UserMongo
+	var user mapper.UserMongo
 	var foundUser entities.User
 	ctx, _ := context.WithTimeout(context.Background(), 60*time.Second)
 	objectID, err := primitive.ObjectIDFromHex(userID)
@@ -63,7 +64,7 @@ func (a Adapter) FindOne(userID string) (entities.User, error) {
 	if err != nil {
 		return foundUser, err
 	}
-	foundUser = MapUserMongoToUser(user)
+	foundUser = mapper.MapUserMongoToUser(user)
 	return foundUser, nil
 }
 
